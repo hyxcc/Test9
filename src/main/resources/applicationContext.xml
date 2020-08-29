@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+">
+    <context:annotation-config/>
+    <!--扫描spring注解-->
+    <context:component-scan base-package="com.hyx"/>
+    <!--加载db.properties-->
+    <context:property-placeholder location="classpath*:*.properties" />
+    <!--数据源-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value=" ${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置别名-->
+        <property name="typeAliasesPackage" value="com.hyx.pojo"/>
+        <property name="mapperLocations" value="classpath:com/hyx/dao/mapper/*.xml"/>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sessionFactory"/>
+        <!--扫描包，进行映射-->
+        <property name="basePackage" value="com.hyx.dao"/>
+    </bean>
+
+
+    <!--注册第一个服务-->
+    <bean id="rmiUserA" class="com.hyx.rmiService.RmiUserServiceImpl"></bean>
+    <bean id="rmiUserServiceA" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="service" ref="rmiUserA"/>
+        <property name="serviceInterface" value="com.hyx.rmiService.RmiUserService"/>
+        <property name="serviceName" value="rmiUserA"/>
+        <property name="registryPort" value="1022"/>
+    </bean>
+    <bean id="rmiStudentA" class="com.hyx.rmiService.RmiStudentServiceImpl"></bean>
+    <bean id="rmiStudentServiceA" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="service" ref="rmiStudentA"/>
+        <property name="serviceInterface" value="com.hyx.rmiService.RmiStudentService"/>
+        <property name="serviceName" value="rmiStudentA"/>
+        <property name="registryPort" value="1022"/>
+    </bean>
+
+    <!--注册第二个服务-->
+    <!--注册服务-->
+    <bean id="rmiUserB" class="com.hyx.rmiService.RmiUserServiceImpl"></bean>
+    <bean id="rmiUserServiceB" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="service" ref="rmiUserB"/>
+        <property name="serviceInterface" value="com.hyx.rmiService.RmiUserService"/>
+        <property name="serviceName" value="rmiUserB"/>
+        <property name="registryPort" value="1023"/>
+    </bean>
+    <bean id="rmiStudentB" class="com.hyx.rmiService.RmiStudentServiceImpl"></bean>
+    <bean id="rmiStudentServiceB" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="service" ref="rmiStudentB"/>
+        <property name="serviceInterface" value="com.hyx.rmiService.RmiStudentService"/>
+        <property name="serviceName" value="rmiStudentB"/>
+        <property name="registryPort" value="1023"/>
+    </bean>
+</beans>
